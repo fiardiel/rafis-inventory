@@ -10,13 +10,13 @@
   python -m venv env
   ```
 2. Activate the virtual environment by running this command:
-- Windows:
-  ```
-  env\Scripts\activate.bat
-  ```
-- Mac:
-  ```
-  source env/bin/activate
-  ```
+  - Windows:
+    ```
+    env\Scripts\activate.bat
+    ```
+  - Mac:
+    ```
+    source env/bin/activate
+    ```
 
 
