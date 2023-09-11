@@ -67,3 +67,43 @@
 	This code sends the application_name, name, and class variable to the html template
 
 ### Step 3. Create a URL routing configuration to access the main app.
+1. Create `urls.py` inside the main directory and then fill in with the following code:
+	```
+	from django.urls import path
+	from main.views import show_main
+
+	app_name = 'main'
+
+	urlpatterns = [
+		path('', show_main, name='show_main'),
+	]
+	```
+	This is responsible for configuring URL patterns to the main application
+
+### Step 4. URL Routing for the project
+1. Open the `urls.py` in the project's `rafis_inventory` directory
+2. Fill the `urls.py` file with this code:
+	```
+	from django.contrib import admin
+	from django.urls import path, include
+
+	urlpatterns = [
+		path("admin/", admin.site.urls),
+		path('main/', include('main.urls')),
+	]
+	```
+	This is responsible for configuring the top-level project URL routes.
+
+
+### Step 5. Editing the models for your app
+1. Create the attributes such as `name, amount, description, category, damage` by filling your
+   `models.py` file with this code:
+   ```	
+	from django.db import models
+	class Items(models.Model):
+			name = models.CharField(max_length=255)
+			amount = models.IntegerField()
+			description = models.TextField()
+			category = models.CharField(max_length=255)
+			damage = models.IntegerField()
+	```
