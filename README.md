@@ -7,7 +7,7 @@
 ### Step 1. Create a django project
 1. Create a virtual environment by running the following command:
   ```
-  python -m venv env
+  python3 -m venv env
   ```
 2. Activate the virtual environment by running this command:
   - Windows:
@@ -107,3 +107,33 @@
 			category = models.CharField(max_length=255)
 			damage = models.IntegerField()
 	```
+
+## Client request flow
+<img src="/assets/PBPImage.png">
+
+A `user` requests entering the app using the url by clicking the link. The url will find
+a way to route to the app. The `urls.py` file contains a link/mapping to the function in `views.py`.
+The `views.py` file will return the HTML template and render it to the user. And then the `views.py`
+file will interact with `models.py` if data is needed. Finally, `models.py` will get the data
+from your database.
+
+
+## Purpose of virtual environment
+Before we talk about the purpose, yes, a django app can run without a virtual environment.
+But, there is a downside to that. The downside is that without a virtual environment,
+the dependencies that's installed would be installed globally, which would cause conflicts with 
+other projects and system packages. One possible case that causes problem is that different projects
+use different versions of python.
+
+## MVC, MVT, MVVM, and the difference between the three
+MVC stands for Model-View-Controller. It seperates the application into model, view, controller. The 
+model is responsible for the data structure and the logic, the view for the display of the data,
+and the controller as the middle man who receives update from view and notifies model to add something.
+
+MVT stands for Model-View-Template. The difference with MVC is that MVT uses template as the user
+interface
+
+MVVM stands for Model-View-ViewModel. This pattern supports two-way data binding between view and View model. 
+This enables automatic propagation of changes, within the state of view model to the View.
+
+The key difference between the 3 are the mediators and the entry point to the app
