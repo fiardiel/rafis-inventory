@@ -1,10 +1,43 @@
-<h1>Rafi's Inventory Page</h1>
+{% extends 'base.html' %}
 
-<h5>Application Name:</h5>
-<p>{{ application_name }}</p>
+{% block content %}
+    <h1>Rafi's Inventory Page</h1>
 
-<h5>Name:</h5>
-<p>{{ name }}</p>
+    <h5>Name:</h5>
+    <p>{{name}}</p>
 
-<h5>Class:</h5>
-<p>{{ class }}</p>
+    <h5>Class:</h5>
+    <p>{{class}}</p>
+
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Damage</th>
+        </tr>
+    
+        {% comment %} Below is how to show the product data {% endcomment %}
+    
+        {% for product in products %}
+            <tr>
+                <td>{{product.name}}</td>
+                <td>{{product.amount}}</td>
+                <td>{{product.description}}</td>
+                <td>{{product.category}}</td>
+                <td>{{product.damage}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <br />
+    
+    <a href="{% url 'main:create_product' %}">
+        <button>
+            Add New Product
+        </button>
+    </a>
+    
+{% endblock content %}
