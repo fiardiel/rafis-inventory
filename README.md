@@ -37,7 +37,7 @@
 2. Add a directory called `templates` in the main app, and then create a `main.html` file in it
 
 3. Fill in my main.html file with the html code below:
-	```html
+	``` html
 	<h1>Rafi's Inventory Page</h1>
 
 	<h5>Application Name:</h5>
@@ -52,7 +52,7 @@
 	What it does is creating the design, and taking the application name, name, and class from the views.py file which I will be talking in the next steps
 
 4. Fill in the views.py with this code:
-	```py
+	``` py
 	from django.shortcuts import render
 
 	def show_main(request):
@@ -68,7 +68,7 @@
 
 ### Step 3. Create a URL routing configuration to access the main app.
 1. Create `urls.py` inside the main directory and then fill in with the following code:
-	```py
+	``` py
 	from django.urls import path
 	from main.views import show_main
 
@@ -83,7 +83,7 @@
 ### Step 4. URL Routing for the project
 1. Open the `urls.py` in the project's `rafis_inventory` directory
 2. Fill the `urls.py` file with this code:
-	```py
+	``` py
 	from django.contrib import admin
 	from django.urls import path, include
 
@@ -145,8 +145,8 @@ The key difference between the 3 are the mediators and the entry point to the ap
 ## Steps
 ### 1. Create `forms.py` in the main folder
 Fill in your `forms.py` with this code:
+	``` py
 
-	```py
 	from django.forms import ModelForm
 	from main.models import Items
 
@@ -154,13 +154,15 @@ Fill in your `forms.py` with this code:
 		class Meta:
 			model = Items
 			fields = ["name", "amount", "description", "category", "damage"]
+
 	```
+
 this code's purpose is to make a form to take input and store it
 
 ### 2. Methods in the `views.py` file
 Fill in your `views.py` with this code:
 
-	```py
+	``` py
 	from django.shortcuts import render
 	from django.http import HttpResponseRedirect
 	from django.urls import reverse
@@ -219,7 +221,7 @@ their IDs when you access their respective urls.
 
 ### 3. Configure your URLs for the requests
 
-	```py
+	``` py
 	from django.urls import path
 	from main.views import show_main, create_product, show_xml, show_json, show_xml_by_id, show_json_by_id
 
