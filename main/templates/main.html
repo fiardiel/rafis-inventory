@@ -4,11 +4,23 @@
     <h1>Rafi's Inventory Page</h1>
 
     <h5>Name:</h5>
-    <p>{{name}}</p>
+    <p>{{ name }}</p>
 
     <h5>Class:</h5>
-    <p>{{class}}</p>
+    <p>{{ class }}</p>
 
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ccc; /* Optional: Add a border to cells for better separation */
+        }
+    </style>
 
     <table>
         <tr>
@@ -18,27 +30,27 @@
             <th>Category</th>
             <th>Damage</th>
         </tr>
-    
+
         {% comment %} Below is how to show the product data {% endcomment %}
-    
+
         {% for product in products %}
             <tr>
-                <td>{{product.name}}</td>
-                <td>{{product.amount}}</td>
-                <td>{{product.description}}</td>
-                <td>{{product.category}}</td>
-                <td>{{product.damage}}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.amount }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.damage }}</td>
             </tr>
         {% endfor %}
     </table>
-    
+
     <br />
     <p>You have saved {{ data_count }} items in this application</p>
-    
+
     <a href="{% url 'main:create_product' %}">
         <button>
             Add New Product
         </button>
     </a>
-    
+
 {% endblock content %}
