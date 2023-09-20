@@ -37,7 +37,7 @@
 2. Add a directory called `templates` in the main app, and then create a `main.html` file in it
 
 3. Fill in my main.html file with the html code below:
-	```
+	```html
 	<h1>Rafi's Inventory Page</h1>
 
 	<h5>Application Name:</h5>
@@ -52,7 +52,7 @@
 	What it does is creating the design, and taking the application name, name, and class from the views.py file which I will be talking in the next steps
 
 4. Fill in the views.py with this code:
-	```
+	```py
 	from django.shortcuts import render
 
 	def show_main(request):
@@ -68,7 +68,7 @@
 
 ### Step 3. Create a URL routing configuration to access the main app.
 1. Create `urls.py` inside the main directory and then fill in with the following code:
-	```
+	```py
 	from django.urls import path
 	from main.views import show_main
 
@@ -83,7 +83,7 @@
 ### Step 4. URL Routing for the project
 1. Open the `urls.py` in the project's `rafis_inventory` directory
 2. Fill the `urls.py` file with this code:
-	```
+	```py
 	from django.contrib import admin
 	from django.urls import path, include
 
@@ -98,7 +98,7 @@
 ### Step 5. Editing the models for your app
 1. Create the attributes such as `name, amount, description, category, damage` by filling your
    `models.py` file with this code:
-   ```	
+   ```	py
 	from django.db import models
 	class Items(models.Model):
 			name = models.CharField(max_length=255)
@@ -137,3 +137,136 @@ MVVM stands for Model-View-ViewModel. This pattern supports two-way data binding
 This enables automatic propagation of changes, within the state of view model to the View.
 
 The key difference between the 3 are the mediators and the entry point to the app
+
+
+
+# Assignment 3
+
+## Steps
+### 1. Create `forms.py` in the main folder
+Fill in your `forms.py` with this code:
+	```py
+	from django.forms import ModelForm
+	from main.models import Items
+
+	class ProductForm(ModelForm):
+		class Meta:
+			model = Items
+			fields = ["name", "amount", "description", "category", "damage"]
+	```
+this code's purpose is to make a form to take input and store it
+
+### 2. Methods in the `views.py` file
+Fill in your `views.py` with this code:
+	```py
+	from django.shortcuts import render
+	from django.http import HttpResponseRedirect
+	from django.urls import reverse
+	from main.forms import ProductForm
+	from main.models import Items
+	from django.http import HttpResponse
+	from django.core import serializers
+
+	def show_main(request):
+		products = Items.objects.all()
+		data_count = products.count()
+
+		context = {
+			'name': 'Rafi Ardiel Erinaldi',
+			'class': 'PBP Int',
+			'products': products,
+			'data_count': data_count
+		}
+
+		return render(request, 'main.html', context)
+
+
+	def create_product(request):
+		form = ProductForm(request.POST or None)
+
+		if form.is_valid() and request.method == "POST":
+			form.save()
+			return HttpResponseRedirect(reverse('main:show_main'))
+
+		context = {'form': form}
+		return render(request, "create_product.html", context)
+
+
+	def show_xml(request):
+		data = Items.objects.all()
+		return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+
+	def show_json(request):
+		data = Items.objects.all()
+		return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+
+	def show_xml_by_id(request, id):
+		data = Items.objects.filter(pk=id)
+		return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+
+	def show_json_by_id(request, id):
+		data = Items.objects.filter(pk=id)
+		return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+	```
+These methods will handle requests such as showing your main page, xml, json, and xml and jason by
+their IDs when you access their respective urls.
+
+### 3. Configure your URLs for the requests
+	```py
+	from django.urls import path
+	from main.views import show_main, create_product, show_xml, show_json, show_xml_by_id, show_json_by_id
+
+	app_name = 'main'
+
+	urlpatterns = [
+		path('', show_main, name='show_main'), path('create-product', create_product, name='create_product'),
+		path('xml/', show_xml, name='show_xml'),
+		path('json/', show_json, name='show_json'),
+		path('xml/<int:id>/', show_xml_by_id, name='show_xml_by_id'),
+		path('json/<int:id>/', show_json_by_id, name='show_json_by_id'),
+	]
+	```
+whenever one of those urls are accessed, they will route you to their respective paths
+
+
+## Difference between POST and GET in django
+The use of POST and GET is distinguishable by their usage. POST is used to submit/modify data
+to your server and will change the state of the server. On the other hand, GET's purpose is to 
+request data from the server without affecting the state of the server.
+
+
+## HTML, JSON, XML
+HTML's purpose is to display the data. JSOn and XML on the other hand are to
+store the data. The difference between XML and JSON is that XML uses the tree
+data structure and treats all data as text, while JSON uses key-value pairs and
+supports simple data types such as strings, booleans, arrays, and objects.
+
+
+## JSON in modern web applications
+JSON is often used in modern web applications due to it being more human-readable than
+XML. It also is easier to parse for programming languages. Since, it uses key-value pairs,
+it can be converted to Python as a dictionary.
+
+
+## Postman accessing the urls
+
+### Main
+<img src="/assets/postman_main.png">
+
+### XML
+<img src="/assets/postman_xml.png">
+
+### JSON
+<img src="/assets/postman_json.png">
+
+
+### XML by ID
+<img src="/assets/postman_xml_by_id.png">
+
+
+### JSON by ID
+<img src="/assets/postman_json_by_id.png">
