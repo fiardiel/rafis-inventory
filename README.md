@@ -98,7 +98,7 @@
 ### Step 5. Editing the models for your app
 1. Create the attributes such as `name, amount, description, category, damage` by filling your
    `models.py` file with this code:
-   ```	py
+   	```	py
 	from django.db import models
 	class Items(models.Model):
 			name = models.CharField(max_length=255)
@@ -145,6 +145,7 @@ The key difference between the 3 are the mediators and the entry point to the ap
 ## Steps
 ### 1. Create `forms.py` in the main folder
 Fill in your `forms.py` with this code:
+
 	```py
 	from django.forms import ModelForm
 	from main.models import Items
@@ -158,6 +159,7 @@ this code's purpose is to make a form to take input and store it
 
 ### 2. Methods in the `views.py` file
 Fill in your `views.py` with this code:
+
 	```py
 	from django.shortcuts import render
 	from django.http import HttpResponseRedirect
@@ -210,12 +212,13 @@ Fill in your `views.py` with this code:
 	def show_json_by_id(request, id):
 		data = Items.objects.filter(pk=id)
 		return HttpResponse(serializers.serialize("json", data), content_type="application/json")
-
 	```
+
 These methods will handle requests such as showing your main page, xml, json, and xml and jason by
 their IDs when you access their respective urls.
 
 ### 3. Configure your URLs for the requests
+
 	```py
 	from django.urls import path
 	from main.views import show_main, create_product, show_xml, show_json, show_xml_by_id, show_json_by_id
@@ -230,6 +233,7 @@ their IDs when you access their respective urls.
 		path('json/<int:id>/', show_json_by_id, name='show_json_by_id'),
 	]
 	```
+
 whenever one of those urls are accessed, they will route you to their respective paths
 
 
