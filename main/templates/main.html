@@ -29,6 +29,7 @@
             <th>Description</th>
             <th>Category</th>
             <th>Damage</th>
+            <th>Actions</th>
         </tr>
 
         {% comment %} Below is how to show the product data {% endcomment %}
@@ -40,6 +41,27 @@
                 <td>{{ product.description }}</td>
                 <td>{{ product.category }}</td>
                 <td>{{ product.damage }}</td>
+                <td>
+                    <a href="/increment_amount/{{ product.id }}">
+                        <button type="button">
+                            Increment Amount
+                        </button>
+                    </a>
+
+                    <a href="/decrement_amount/{{ product.id }}">
+                        <button type="button">
+                            Decrement Amount
+                        </button>
+                    </a>
+
+
+                    <a href="/delete_item/ {{ product.id }}">
+                        <button type="button">
+                            Delete Item
+                        </button>
+                    </a>
+
+                </td>
             </tr>
         {% endfor %}
     </table>

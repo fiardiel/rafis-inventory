@@ -98,3 +98,29 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+
+def increment_amount(request, id):
+    item = Items.objects.get(id=id)
+    item.amount += 1
+    item.save()
+    return HttpResponseRedirect(reverse('main:show_main'))
+
+def decrement_amount(request, id):
+    item = Items.objects.get(id=id)
+    if item.amount > 1:
+        item.amount -= 1
+        item.save()
+    else:
+        item.delete()
+    
+    return HttpResponseRedirect(reverse('main:show_main'))
+
+def delete_item(request, id):
+    try:
+        item = Items.objects.get(id=id)
+        item.delete()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    except Items.DoesNotExist:
+        return HttpResponse(status=204)

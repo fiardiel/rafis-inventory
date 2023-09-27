@@ -145,6 +145,7 @@ The key difference between the 3 are the mediators and the entry point to the ap
 ## Steps
 ### 1. Create `forms.py` in the main folder
 Fill in your `forms.py` with this code:
+
 	``` py
 
 	from django.forms import ModelForm
@@ -276,3 +277,224 @@ it can be converted to Python as a dictionary.
 
 ### JSON by ID
 <img src="/assets/postman_json_by_id.png">
+
+
+
+# Assignment 4
+## Steps
+### Step 1. Make the register, login, and logout functions
+Open `views.py` and add these imports code:
+	``` py
+	from django.contrib.auth.forms import UserCreationForm
+	from django.contrib import messages  
+	from django.contrib.auth import authenticate, login
+	from django.contrib.auth import logout
+	```
+
+Write this code in your `views.py`:
+	``` py
+	def register(request):
+		form = UserCreationForm()
+
+		if request.method == "POST":
+			form = UserCreationForm(request.POST)
+			if form.is_valid():
+				form.save()
+				messages.success(request, 'Your account has been successfully created!')
+				return redirect('main:login')
+		context = {'form':form}
+		return render(request, 'register.html', context)
+
+
+	def login_user(request):
+		if request.method == 'POST':
+			username = request.POST.get('username')
+			password = request.POST.get('password')
+			user = authenticate(request, username=username, password=password)
+			if user is not None:
+				login(request, user)
+				response = HttpResponseRedirect(reverse("main:show_main")) 
+				response.set_cookie('last_login', str(datetime.datetime.now()))
+				return response
+			else:
+				messages.info(request, 'Sorry, incorrect username or password. Please try again.')
+		context = {}
+		return render(request, 'login.html', context)
+
+
+	def logout_user(request):
+		logout(request)
+		response = HttpResponseRedirect(reverse('main:login'))
+		response.delete_cookie('last_login')
+		return response
+	```
+
+Open your `urls.py` in your main directory and copy these imports:
+	``` py
+	from main.views import register
+	from main.views import login_user
+	from main.views import logout_user
+	```
+
+Add these paths to your urlpatterns:
+
+	``` py
+	path('register/', register, name='register'),
+    path('login/', login_user, name='login'),
+    path('logout/', logout_user, name='logout'),
+	```
+
+Modify your `show_main` function like this:
+
+	``` py
+	@login_required(login_url='/login')
+	def show_main(request):
+		products = Items.objects.all()
+		data_count = products.count()
+
+		context = {
+			'name': request.user.username,
+			'class': 'PBP Int',
+			'products': products,
+			'data_count': data_count,
+			'last_login': request.COOKIES['last_login'],
+		}
+
+		return render(request, 'main.html', context)
+	```
+
+Make the login page in the template in `login.html` by adding this code:
+	``` html
+	{% extends 'base.html' %}
+
+	{% block meta %}
+		<title>Login</title>
+	{% endblock meta %}
+
+	{% block content %}
+
+	<div class = "login">
+
+		<h1>Login</h1>
+
+		<form method="POST" action="">
+			{% csrf_token %}
+			<table>
+				<tr>
+					<td>Username: </td>
+					<td><input type="text" name="username" placeholder="Username" class="form-control"></td>
+				</tr>
+						
+				<tr>
+					<td>Password: </td>
+					<td><input type="password" name="password" placeholder="Password" class="form-control"></td>
+				</tr>
+
+				<tr>
+					<td></td>
+					<td><input class="btn login_btn" type="submit" value="Login"></td>
+				</tr>
+			</table>
+		</form>
+
+		{% if messages %}
+			<ul>
+				{% for message in messages %}
+					<li>{{ message }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}     
+			
+		Don't have an account yet? <a href="{% url 'main:register' %}">Register Now</a>
+
+	</div>
+
+	{% endblock content %}
+
+	```
+
+Do the same with your register.html but with this code:
+	``` html
+	{% extends 'base.html' %}
+
+	{% block meta %}
+		<title>Register</title>
+	{% endblock meta %}
+
+	{% block content %}  
+
+	<div class = "login">
+		
+		<h1>Register</h1>  
+
+			<form method="POST" >  
+				{% csrf_token %}  
+				<table>  
+					{{ form.as_table }}  
+					<tr>  
+						<td></td>
+						<td><input type="submit" name="submit" value="Daftar"/></td>  
+					</tr>  
+				</table>  
+			</form>
+
+		{% if messages %}  
+			<ul>   
+				{% for message in messages %}  
+					<li>{{ message }}</li>  
+					{% endfor %}  
+			</ul>   
+		{% endif %}
+
+	</div>  
+
+	{% endblock content %}
+	```
+
+Finally in the main.html add the logout button by adding this code
+	``` html
+	<a href="{% url 'main:logout' %}">
+        <button>
+            Logout
+        </button>
+    </a>
+	```
+
+
+### Step 2. Apply cookies
+Make these imports in the `views.py` file
+
+	``` py
+	import datetime
+	from django.http import HttpResponseRedirect
+	from django.urls import revers
+	```
+
+Add this code to your `context` in your `show_main` function of the `views.py` file
+
+	``` py
+	'last_login': request.COOKIES['last_login'],
+	```
+
+The other steps to add cookie I've already done in the 1st step
+
+
+## Django's UserCreationForm and its advantages and disadvantages
+Django's UserCreationForm is a built in form in django that mainly is used to 
+create a user for your website. There, you need to fill in your username, password,
+and password confirmation, where the password's strength is emphasized.
+The advantage of it is that it is easy to use and there's a template for it. The downside
+is that it's not quite customizable.
+
+## Authentication vs Authorization. Why are they both important?
+Authentication is a process to verify whether someone is who they exactly are or not,
+whereas authorization is a process to verify whether someone have access to certain files,
+apps, or data. They're both important since there are informations that can't be shared publicly
+or there are things that you don't want any random people to have access to.
+
+## Cookies
+A cookie is a small piece of information which is stored in the client browser. It is used to store 
+user's data in a file permanently (or for the specified time). Cookie has its expiry date and time 
+and removes automatically when gets expire. Django provides built-in methods to set and fetch cookie.
+
+Cookies are secure, but if used incorrectly, someone can access your data/sensitive information
