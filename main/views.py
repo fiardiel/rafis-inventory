@@ -17,7 +17,7 @@ from django.urls import reverse
 
 @login_required(login_url='/login')
 def show_main(request):
-    products = Items.objects.all()
+    products = Items.objects.filter(user=request.user)
     data_count = products.count()
 
     context = {
@@ -116,11 +116,26 @@ def decrement_amount(request, id):
     
     return HttpResponseRedirect(reverse('main:show_main'))
 
-def delete_item(request, id):
-    try:
-        item = Items.objects.get(id=id)
-        item.delete()
+def delete_product(request, id):
+    # Get data by ID
+    product = Items.objects.get(pk=id)
+    # Delete data
+    product.delete()
+    # Return to the main page
+    return HttpResponseRedirect(reverse('main:show_main'))
+    
+
+def edit_product(request, id):
+    # Get product by ID
+    product = Items.objects.get(pk = id)
+
+    # Set product as instance of form
+    form = ProductForm(request.POST or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
+        # Save the form and return to home page
+        form.save()
         return HttpResponseRedirect(reverse('main:show_main'))
 
-    except Items.DoesNotExist:
-        return HttpResponse(status=204)
+    context = {'form': form}
+    return render(request, "edit_product.html", context)

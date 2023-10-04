@@ -498,3 +498,28 @@ user's data in a file permanently (or for the specified time). Cookie has its ex
 and removes automatically when gets expire. Django provides built-in methods to set and fetch cookie.
 
 Cookies are secure, but if used incorrectly, someone can access your data/sensitive information
+
+
+
+# Assignment 5
+
+## HTML tags
+
+
+`<a>` is for hyperlinks
+`<h5>, <h1>, <h2>,` etc. are for headers
+`<p>` is for paragraph/text
+
+## Bootstrap vs Tailwind
+So tailwind is more do-it-yourself and more customizable. You can make your own custom designs
+from scratch with tailwind, and with flowbite you can search for templates/examples. With bootstrap,
+
+## Margin and Padding
+Margin is the space outside of your element, whilst padding is the space inside your element, for exaxmple 
+if you have a button, the padding is the space inside the button for the space between the text and the outline
+
+## Steps
+1. Install Tailwind
+2. Create a navbar in the templates with the file name `navbar.html` and modify using tailwind codes
+3. Modify the product tables using tailwind
+4. Make cards for the login, create, edit, and register pages and insert hyperlinks to each other.
