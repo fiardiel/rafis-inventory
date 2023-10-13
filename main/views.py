@@ -12,8 +12,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required(login_url='/login')
 def show_main(request):
@@ -139,3 +140,36 @@ def edit_product(request, id):
 
     context = {'form': form}
     return render(request, "edit_product.html", context)
+
+
+def get_product_json(request):
+    product_item = Items.objects.all()
+    return HttpResponse(serializers.serialize('json', product_item))
+
+@csrf_exempt
+def add_product_ajax(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        amount = request.POST.get("amount")
+        description = request.POST.get("description")
+        category = request.POST.get("category")
+        damage = request.POST.get("damage")
+        user = request.user
+
+        new_product = Items(name=name, amount=amount, description=description, 
+                            category=category, damage=damage, user=user)
+        new_product.save()
+
+        return HttpResponse(b"CREATED", status=201)
+
+    return HttpResponseNotFound()
+
+
+@csrf_exempt
+def ajax_delete(request, id):
+    # Get data by ID
+    product = Items.objects.get(pk=id)
+    # Delete data
+    product.delete()
+    # Return to the main page
+    return HttpResponse(b"OK", status=201)

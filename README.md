@@ -523,3 +523,251 @@ if you have a button, the padding is the space inside the button for the space b
 2. Create a navbar in the templates with the file name `navbar.html` and modify using tailwind codes
 3. Modify the product tables using tailwind
 4. Make cards for the login, create, edit, and register pages and insert hyperlinks to each other.
+
+
+
+
+# Assignment 6
+## Steps
+
+### Installing Flowbite
+Since I already installed `node.js` and also `tailwind` I just need to follow
+the installation steps for Flowbite CSS, which you can see in this link:
+
+[Flowbite Installation](https://flowbite.com/docs/getting-started/quickstart/)
+
+### Perform AJAX GET and POST
+1. Create a `add_product_ajax` function in your `views.py`:
+
+	``` py
+	@csrf_exempt
+	def add_product_ajax(request):
+		if request.method == 'POST':
+			name = request.POST.get("name")
+			amount = request.POST.get("amount")
+			description = request.POST.get("description")
+			category = request.POST.get("category")
+			damage = request.POST.get("damage")
+			user = request.user
+
+			new_product = Items(name=name, amount=amount, description=description, 
+								category=category, damage=damage, user=user)
+			new_product.save()
+
+			return HttpResponse(b"CREATED", status=201)
+
+		return HttpResponseNotFound()
+	```
+
+2. Create a `get_product_json` function in your `views.py`:
+
+	``` py
+	def get_product_json(request):
+		product_item = Items.objects.all()
+		return HttpResponse(serializers.serialize('json', product_item))
+	```
+
+3. In your `urls.py`, import the `add_product_ajax` and `get_product_json` function
+
+
+### Showing the product data using fetch() API
+1. Add these scripts to your `main.html` file:
+
+	```html
+	<script>
+        async function getProducts() {
+            return fetch("{% url 'main:get_product_json' %}").then((res) => res.json())
+        }
+
+
+        async function refreshProducts() {
+            document.getElementById("product_table").innerHTML = ""
+            const products = await getProducts()
+            let htmlString = `\n
+            <div id="product_table" class="grid justify-center px-10 py-10">
+                <table class="w-fit text-left bg-slate-600 rounded-xl">
+                    <thead class="bg-indigo-700 rounded-t-xl border-b dark:border-gray-600">
+                        <tr>
+                            <th class="px-5 py-2 rounded-tl-xl">Name</th>
+                            <th class="px-5 py-2">Amount</th>
+                            <th class="px-5 py-2">Description</th>
+                            <th class="px-5 py-2">Category</th>
+                            <th class="px-5 py-2">Damage</th>
+                            <th class="px-5 py-2 rounded-tr-xl">Actions</th>
+                        </tr>
+                    </thead>`
+
+            products.forEach((item) => {
+                htmlString += `\n
+                    <tbody>
+                        <tr>
+                            <td class="px-5 py-2">${ item.fields.name }</td>
+                            <td class="px-5 py-2">${ item.fields.amount }</td>
+                            <td class="px-5 py-2">${ item.fields.description }</td>
+                            <td class="px-5 py-2">${ item.fields.category }</td>
+                            <td class="px-5 py-2">${ item.fields.damage }</td>
+                            <td class="px-5 py-2">
+                                <a href="/increment_amount/${ item.pk }">
+                                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cloud-plus-fill" viewBox="0 0 16 16">
+                                            <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm.5 4v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 1 0z"/>
+                                        </svg>
+                                    </button>
+                                </a>
+
+                                <a href="/decrement_amount/${ item.pk }">
+                                    <button type="button" class="text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 font-medium rounded-lg text-sm px-3 py-2 mr-2 mb-2 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cloud-minus-fill" viewBox="0 0 16 16">
+                                            <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zM6 7.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1 0-1z"/>
+                                        </svg>
+                                    </button>
+                                </a>
+
+
+                                <a href="/delete/${item.pk}">
+                                    <button type="button" class="text-white bg-red-700 hover:bg-red-600 focus:ring-4 font-medium rounded-lg text-sm px-3 py-2 mr-2 mb-2 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                        </svg>
+                                    </button>
+                                </a>
+
+                                <a href="/edit-product/${item.pk}">
+                                    <button type="button" class="py-2 px-3 mr-2 mb-2 text-sm font-medium text-gray-500 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                        </svg>
+                                    </button>
+                                </a>
+
+                            </td>
+
+                        </tr>`
+
+                    
+            })
+            htmlString += `</tbody>
+
+                <tfoot>
+                    <tr class="font-semibold text-gray-900 dark:text-white">
+                        <th scope="row" class="px-6 py-3 text-base">Total</th>
+                        <td id="item_count" class="px-6 py-3"> 
+                            {{ data_count }}
+                        </td>
+                    </tr>
+                </tfoot>
+
+                </table>
+            </div>` 
+
+            document.getElementById("product_table").innerHTML = htmlString
+            document.getElementById("item_count").innerHTML = `${products.length}`
+        }
+
+        refreshProducts()
+
+
+        function addProduct() {
+            fetch("{% url 'main:add_product_ajax' %}", {
+                method: "POST",
+                body: new FormData(document.querySelector('#form'))
+            }).then(refreshProducts)
+
+            document.getElementById("form").reset()
+            return false
+        }
+
+        document.getElementById("button_add").onclick = addProduct
+    </script>
+	 
+	```
+
+### Creating a modal to add product using AJAX
+1. Create the modal by copying this code to your `main.html` file
+
+	```	html
+	<div id="add_product_modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-md max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="add_product_modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <div class="font-bold text-2xl px-6 py-6 lg:px-8 mb-5">Add a new item</h3>
+                    <form class="space-y-6" action="#" method="POST" id="form">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item name</label>
+                            <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Your item name" required>
+                        </div>
+
+                        <div>
+                            <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item amount</label>
+                            <input type="number" name="amount" id="amount" placeholder="Enter an amount (integer)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                        </div>
+
+                        <div>
+                            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                            <input type="text" name="description" id="description" placeholder="Item description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                        </div>
+
+                        <div>
+                            <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item Category</label>
+                            <input type="text" name="category" id="category" placeholder="Enter your item category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                        </div>
+
+                        <div>
+                            <label for="damage" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Damage</label>
+                            <input type="number" name="damage" id="damage" placeholder="Enter your item damage (0 if not a weapon)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                        </div>
+
+                        <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" id="button_add" data-modal-hide="add_product_modal">Add an item</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div> 
+	```
+	In that step, one thing you have to note is 
+	specify the button id and the modal id so that 
+	it can be accessed
+
+2. In my `navbar.html` file, change the add product button:
+	```html
+	<button data-modal-target="add_product_modal" data-modal-toggle="add_product_modal" class="block text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-blue-800 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-110 duration-150" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+            </svg>
+    </button>
+	```
+
+
+## Synchronous vs Asynchronous Programming
+The difference between the both of them is that synchronous programming runs the code
+sequentially while asynchronous can run them as parallel
+
+
+## Event-driven programming paradigm
+Event-driven programming is a paradigm where the flow of a program is determined by 
+events like user actions or system signals. In JavaScript and AJAX, it means that code 
+responds to events such as button clicks, data arrival, or timers.
+
+
+## Asynchronous programming using AJAX
+In AJAX, asynchronous programming is used to make requests to a server without blocking 
+the rest of the web page. It allows for non-blocking operations, so the webpage remains 
+responsive. You typically define a callback function that is executed when the data is 
+received from the server, ensuring the user interface remains interactive while waiting for data.
+
+
+
+
+
+
+
