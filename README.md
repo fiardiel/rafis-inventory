@@ -467,7 +467,7 @@ Make these imports in the `views.py` file
 	``` py
 	import datetime
 	from django.http import HttpResponseRedirect
-	from django.urls import revers
+	from django.urls import reverse
 	```
 
 Add this code to your `context` in your `show_main` function of the `views.py` file
