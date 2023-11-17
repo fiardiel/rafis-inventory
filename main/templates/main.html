@@ -12,6 +12,7 @@
                     <th class="px-5 py-2">Category</th>
                     <th class="px-5 py-2">Damage</th>
                     <th class="px-5 py-2 rounded-tr-xl">Actions</th>
+                    <th class="px-5 py-2 rounded-tr-xl">Rarity</th>
                 </tr>
             </thead>
 
@@ -25,6 +26,7 @@
                     <td class="px-5 py-2">{{ product.description }}</td>
                     <td class="px-5 py-2">{{ product.category }}</td>
                     <td class="px-5 py-2">{{ product.damage }}</td>
+                    <td class="px-5 py-2">{{ product.rarity}}</td>
                     <td class="px-5 py-2">
                         <a href="/increment_amount/{{ product.id }}">
                             <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">+</button>
@@ -115,6 +117,9 @@
 
 
     <script>
+
+
+
         async function getProducts() {
             return fetch("{% url 'main:get_product_json' %}").then((res) => res.json())
         }
@@ -134,6 +139,7 @@
                             <th class="px-5 py-2">Category</th>
                             <th class="px-5 py-2">Damage</th>
                             <th class="px-5 py-2 rounded-tr-xl">Actions</th>
+                            <td class="px-5 py-2">Rarity</td>
                         </tr>
                     </thead>`
 
@@ -146,6 +152,7 @@
                             <td class="px-5 py-2">${ item.fields.description }</td>
                             <td class="px-5 py-2">${ item.fields.category }</td>
                             <td class="px-5 py-2">${ item.fields.damage }</td>
+                            <td class="px-5 py-2">${ item.fields.rarity }</td>
                             <td class="px-5 py-2">
                                 <a href="/increment_amount/${ item.pk }">
                                     <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
@@ -219,6 +226,61 @@
         }
 
         document.getElementById("button_add").onclick = addProduct
+
+
+        function filterItemsByRarity(rarity) {
+            $.ajax({
+                url: '/filter-books-by-rarity/',
+                method: 'GET',
+                data: { rarity: rarity },
+                success: function (data) {
+                    var bookList = $('#book-list');
+                    bookList.empty();
+
+                    for (var i = 0; i < data.datas.length; i++) {
+                        var item = data.datas[i];
+                        var itemHtml = '<div class="col-md-4">' +
+                            '<div class="card card-product">' +
+                            '<div class="card-header card-header-image" data-header-animation="true">' +
+                            '<a href="#">' +
+                            '<img class="img" src="/main/static/assets/img/card-1.jpg">' +
+                            '</a>' +
+                            '</div>' +
+                            '<div class="card-body">' +
+                            '<div class="card-actions text-center">' +
+                            '<button type="button" class="btn btn-danger btn-link fix-broken-card">' +
+                            '<i class="material-icons">build</i> Fix Header!' +
+                            '</button>' +
+                            '<button type="button" id="btnwishlist" class="btn btn-success btn-link add-to-wishlist" data-book-id="' + book.bookid + '" rel="tooltip" data-placement="bottom" title="Add to wishlist">' +
+                            '<i class="material-icons">bookmark</i>' +
+                            '</button>' +
+                            '<button type="button" id="btnread" class="btn btn-primary btn-link" data-book-id="' + book.bookid + '" rel="tooltip" data-placement="bottom" title="I have read this">' +
+                            '<i class="material-icons">check</i>' +
+                            '</button>' +
+                            '</div>' +
+                            '<h4 class="card-title">' +
+                            '<a href="#">' + item.name + '</a>' +
+                            '</h4>' +
+                            '<div class="card-description">' +
+                            'Author: ' + item.amount + '<br>' +
+                            'Total Review: ' + item.description + '<br>' +
+                            'Rating: ' + item.category + '<br>' +
+                            'Genre: ' + item.damage +
+                            'Rating: ' + item.rating
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>';
+
+                        bookList.append(bookHtml);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log("An error occurred: " + error);
+                }
+            });
+        }
+
     </script>
 
 {% endblock content %}

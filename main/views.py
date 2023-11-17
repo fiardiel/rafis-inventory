@@ -195,3 +195,32 @@ def create_product_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+    
+def filter_items_by_rarity(request):
+    rarity = request.GET.get('rarity', 'all')
+
+    if rarity == 'all':
+        items = Items.objects.all()
+    elif rarity == 'S':
+        items = Items.objects.exclude(genre__icontains='S')
+    elif rarity == 'SR':
+        items = Items.objects.filter(genre__icontains='SR')
+    elif rarity == 'SSR':
+        items = Items.objects.filter(genre__icontains='SSR')
+    else:
+        return JsonResponse({'error': 'Invalid category'})
+
+    item_data = []
+
+    for item in items:
+        item_data.append({
+            'itemid': items.pk,
+            'name': items.name,
+            'amount': items.amount,
+            'description': items.description,
+            'category': items.category,
+            'damage': items.damage,
+            'rarity': items.rarity
+        })
+
+    return JsonResponse({'datas': item_data})

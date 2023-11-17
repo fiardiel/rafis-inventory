@@ -9,3 +9,4 @@ class Items(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=255)
     damage = models.IntegerField()
+    rarity = models.CharField(max_length=3)
