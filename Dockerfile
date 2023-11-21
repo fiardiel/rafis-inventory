@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update --yes --quiet \
     && apt-get install --yes --quiet --no-install-recommends \
     && apt-get install nodejs -y \
-    && apt install npm -y --fix-missin
+    && apt install npm -y --fix-missing
 
 RUN addgroup --system django \
     && adduser --system --ingroup django django
